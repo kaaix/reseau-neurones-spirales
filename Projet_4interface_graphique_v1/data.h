@@ -16,9 +16,12 @@ typedef struct {
     double label[2];
 } DataPoint;
 
+// le dataset_p contiendra MAX_CLASSES spirales
+// (une spirale pour chaque classe)
+extern DataPoint dataset_P[NB_POINTS_SPIRALE * MAX_CLASSES];
+
 // Le dataset contiendra 2*NB_POINTS_SPIRALE points (une spirale pour chaque classe)
-extern DataPoint dataset[NB_POINTS_SPIRALE * MAX_CLASSES];
-//extern DataPoint dataset[NB_POINTS_SPIRALE * 2]; // 2 classes (bleu et rouge)
+extern DataPoint dataset[NB_POINTS_SPIRALE * 2]; // 2 classes (bleu et rouge)
 
 // Génère les points des spirales (normalisés dans [-1, 1])
 void generer_spirales_archimede();

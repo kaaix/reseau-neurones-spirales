@@ -1,0 +1,244 @@
+ Rapport sur l'Interface Graphique dans le Projet
+
+L'interface graphique de ce projet est construite à l'aide de **SDL2** et **SDL2_ttf** pour la gestion des fenêtres, des événements, des boutons, et du rendu de texte. Voici une analyse détaillée de tous les aspects liés à l'interface graphique dans le projet.
+
+---
+
+## **1. Structure Générale**
+
+L'interface graphique est principalement gérée dans les fichiers suivants :
+- **`ui_manager.c`** : Contient les fonctions principales pour gérer les fenêtres, les boutons, et les interactions utilisateur.
+- **`sdl_display.c`** : Fournit des fonctions utilitaires pour le rendu graphique, comme le mélange des couleurs et l'affichage des spirales.
+- **`main.c`** : Initialise l'interface principale et gère les interactions de haut niveau.
+
+Les bibliothèques utilisées incluent :
+- **SDL2** : Pour la gestion des fenêtres, des événements, et du rendu graphique.
+- **SDL2_ttf** : Pour le rendu de texte.
+
+---
+
+## **2. Fonctionnalités de l'Interface Graphique**
+
+### **2.1. Fenêtre Principale**
+- **Localisation** : main.c
+- **Description** :
+  - La fenêtre principale est créée avec une taille de **800x600 pixels**.
+  - Deux boutons sont affichés :
+    - **"R/B"** : Permet de travailler avec les spirales rouge et bleue.
+    - **"Personnalisé"** : Permet de travailler avec des spirales personnalisées.
+  - Les boutons sont dessinés à l'aide de la fonction `draw_button` (définie dans ui_manager.c).
+- **Événements Gérés** :
+  - **SDL_QUIT** : Ferme la fenêtre principale.
+  - **SDL_MOUSEBUTTONDOWN** : Vérifie si un bouton a été cliqué et ouvre la fenêtre correspondante (`show_train_or_load_window`).
+
+---
+
+### **2.2. Fenêtre "Train ou Load"**
+- **Localisation** : ui_manager.c (`show_train_or_load_window`)
+- **Description** :
+  - Cette fenêtre permet à l'utilisateur de choisir entre :
+    - **Train** : Lancer un entraînement.
+    - **Load** : Charger un réseau neuronal existant.
+  - Deux boutons sont affichés : "Train" et "Load".
+- **Événements Gérés** :
+  - **SDL_QUIT** : Ferme la fenêtre.
+  - **SDL_MOUSEBUTTONDOWN** :
+    - Si "Train" est cliqué :
+      - Si le mode est "Personnalisé", ouvre la fenêtre pour choisir le nombre de classes (`show_custom_spirals_window`).
+      - Sinon, lance directement l'entraînement (`show_train_execution_window`).
+    - Si "Load" est cliqué, ouvre la fenêtre pour charger un réseau (`show_load_window`).
+
+---
+
+### **2.3. Fenêtre "Nombre de Classes"**
+- **Localisation** : ui_manager.c (`show_custom_spirals_window`)
+- **Description** :
+  - Cette fenêtre permet à l'utilisateur de saisir le nombre de classes pour les spirales personnalisées.
+  - Une zone de texte est affichée avec un curseur clignotant.
+  - Un texte explicatif indique que le nombre maximum de classes est **10**.
+- **Événements Gérés** :
+  - **SDL_QUIT** : Ferme la fenêtre.
+  - **SDL_TEXTINPUT** : Ajoute le texte saisi à la zone de texte.
+  - **SDL_KEYDOWN** :
+    - **BACKSPACE** : Supprime le dernier caractère saisi.
+    - **RETURN** : Valide le nombre de classes et lance l'entraînement (`show_train_execution_window`).
+
+---
+
+### **2.4. Fenêtre "Chargement de Réseau"**
+- **Localisation** : ui_manager.c (`show_load_window`)
+- **Description** :
+  - Cette fenêtre permet de choisir entre :
+    - **Default** : Charger un réseau par défaut (`reseau_sauvegarde.bin`).
+    - **Custom** : Saisir le nom d'un fichier à charger.
+  - Deux boutons sont affichés : "Default" et "Custom".
+- **Événements Gérés** :
+  - **SDL_QUIT** : Ferme la fenêtre.
+  - **SDL_MOUSEBUTTONDOWN** :
+    - Si "Default" est cliqué, charge le fichier reseau_sauvegarde.bin.
+    - Si "Custom" est cliqué, ouvre une fenêtre pour saisir le nom du fichier (`show_custom_file_input_window`).
+
+---
+
+### **2.5. Fenêtre "Saisie du Nom de Fichier"**
+- **Localisation** : ui_manager.c (`show_custom_file_input_window`)
+- **Description** :
+  - Cette fenêtre permet à l'utilisateur de saisir le nom d'un fichier à charger.
+  - Une zone de texte est affichée avec un curseur clignotant.
+- **Événements Gérés** :
+  - **SDL_QUIT** : Ferme la fenêtre.
+  - **SDL_TEXTINPUT** : Ajoute le texte saisi à la zone de texte.
+  - **SDL_KEYDOWN** :
+    - **BACKSPACE** : Supprime le dernier caractère saisi.
+    - **RETURN** : Vérifie si le fichier existe et le charge (`load_network`).
+
+---
+
+### **2.6. Fenêtre "Entraînement en Cours"**
+- **Localisation** : ui_manager.c (`show_train_execution_window`)
+- **Description** :
+  - Cette fenêtre affiche l'entraînement en cours.
+  - Les spirales générées sont affichées en temps réel.
+  - Une fois l'entraînement terminé, le réseau est sauvegardé dans reseau_sauvegarde.bin.
+- **Événements Gérés** :
+  - **SDL_QUIT** : Ferme la fenêtre.
+
+---
+
+### **2.7. Fenêtre "Réseau Chargé"**
+- **Localisation** : ui_manager.c (`load_network`)
+- **Description** :
+  - Cette fenêtre affiche un réseau chargé depuis un fichier.
+  - Les spirales et la frontière de décision du réseau sont affichées.
+- **Événements Gérés** :
+  - **SDL_QUIT** : Ferme la fenêtre.
+
+---
+
+## **3. Fonctions Utilitaires**
+
+### **3.1. `draw_button`**
+- **Localisation** : ui_manager.c
+- **Description** :
+  - Dessine un bouton avec une bordure, un fond coloré, et un texte centré.
+- **Utilisation** :
+  - Utilisée pour dessiner tous les boutons dans les différentes fenêtres.
+
+### **3.2. `render_text`**
+- **Localisation** : ui_manager.c
+- **Description** :
+  - Affiche un texte centré dans une zone spécifiée.
+- **Utilisation** :
+  - Utilisée pour afficher des textes explicatifs et des étiquettes sur les boutons.
+
+### **3.3. `melange_couleurs`**
+- **Localisation** : sdl_display.c
+- **Description** :
+  - Mélange les couleurs rouge et bleu en fonction des probabilités fournies.
+- **Utilisation** :
+  - Utilisée pour colorier l'écran en fonction des sorties du réseau.
+
+### **3.4. `afficher_spirales`**
+- **Localisation** : sdl_display.c
+- **Description** :
+  - Affiche les spirales rouge et bleue de référence.
+- **Utilisation** :
+  - Utilisée dans la fenêtre "Entraînement en Cours" et "Réseau Chargé".
+
+---
+
+## **4. Gestion des Événements**
+
+### **4.1. Gestion de `SDL_QUIT`**
+- Toutes les fenêtres gèrent l'événement `SDL_QUIT` pour permettre à l'utilisateur de fermer la fenêtre en cliquant sur le bouton de fermeture.
+
+### **4.2. Gestion de la Saisie de Texte**
+- Les fenêtres "Nombre de Classes" et "Saisie du Nom de Fichier" gèrent les événements `SDL_TEXTINPUT` et `SDL_KEYDOWN` pour permettre la saisie de texte.
+
+### **4.3. Gestion des Clics**
+- Les clics sur les boutons sont détectés avec `SDL_MOUSEBUTTONDOWN`.
+
+---
+
+## **5. Points Forts**
+
+- **Interface Intuitive** : Les différentes fenêtres et boutons rendent l'application facile à utiliser.
+- **Gestion Dynamique** : Les fenêtres s'ouvrent et se ferment dynamiquement en fonction des actions de l'utilisateur.
+- **Rendu Graphique** : Les spirales et la frontière de décision sont affichées en temps réel, offrant une visualisation claire.
+
+---
+
+## **6. Améliorations Possibles**
+
+1. **Gestion des Erreurs** :
+   - Ajouter des messages d'erreur visuels dans les fenêtres (par exemple, si un fichier n'existe pas).
+
+2. **Personnalisation** :
+   - Permettre à l'utilisateur de personnaliser davantage les couleurs et les paramètres des spirales.
+
+3. **Optimisation** :
+   - Réduire la consommation CPU en optimisant les boucles d'événements et de rendu.
+
+4. **Accessibilité** :
+   - Ajouter des raccourcis clavier pour naviguer entre les fenêtres.
+
+Vous avez raison, et c'est un point important à mentionner dans le rapport. Voici une mise à jour du rapport pour inclure ce problème non résolu concernant la fermeture des fenêtres de manière graphique.
+
+---
+
+### **Mise à jour du Rapport : Problème avec la Fermeture des Fenêtres**
+
+---
+
+## **8. Problème Identifié : Fermeture des Fenêtres**
+
+### **Description du Problème**
+- Lorsqu'une fenêtre est ouverte (par exemple, "Train ou Load", "Nombre de Classes", ou "Chargement de Réseau"), cliquer sur le bouton de fermeture de la fenêtre (croix en haut à droite) ne ferme pas toujours la fenêtre comme attendu.
+- Dans certains cas, la fenêtre principale ou d'autres fenêtres restent ouvertes, et l'application ne peut être complètement fermée qu'en utilisant `Ctrl+C` dans le terminal.
+
+### **Cause Potentielle**
+- Bien que l'événement `SDL_QUIT` soit géré dans chaque fenêtre, il semble que :
+  1. **`globalRunning`** ne soit pas toujours mis à jour correctement, ce qui empêche la fermeture globale de l'application.
+  2. Les dépendances entre les fenêtres (par exemple, une fenêtre secondaire ouverte depuis une fenêtre principale) ne sont pas gérées de manière cohérente.
+  3. Les ressources SDL (fenêtres, renderers) ne sont pas toujours libérées correctement, ce qui peut entraîner des comportements inattendus.
+
+### **Impact**
+- L'utilisateur ne peut pas fermer les fenêtres de manière intuitive en cliquant sur le bouton de fermeture.
+- Cela nuit à l'expérience utilisateur et peut donner l'impression que l'application est bloquée.
+
+### **Solution Proposée**
+Pour résoudre ce problème, voici les étapes recommandées :
+1. **Revoir la Gestion de `SDL_QUIT`** :
+   - Assurez-vous que chaque fenêtre met correctement à jour `globalRunning` et détruit ses ressources avant de quitter.
+   - Exemple :
+     ```c
+     if (event.type == SDL_QUIT) {
+         globalRunning = 0; // Arrêter l'application globale
+         running = 0;       // Fermer la fenêtre actuelle
+     }
+     ```
+
+2. **Centraliser la Gestion des Fenêtres** :
+   - Utilisez une fonction ou une structure centralisée pour suivre l'état de toutes les fenêtres ouvertes.
+   - Exemple :
+     ```c
+     void close_all_windows() {
+         SDL_DestroyRenderer(renderer1);
+         SDL_DestroyWindow(window1);
+         SDL_DestroyRenderer(renderer2);
+         SDL_DestroyWindow(window2);
+         // Libérer toutes les ressources
+     }
+     ```
+
+3. **Ajouter des Journaux pour Déboguer** :
+   - Ajoutez des `printf` pour vérifier si `SDL_QUIT` est bien détecté et si les fenêtres sont correctement détruites.
+
+4. **Tester avec un Exemple Minimal** :
+   - Créez un exemple minimal avec une seule fenêtre pour isoler le problème et valider la gestion de `SDL_QUIT`.
+
+---
+
+### **Conclusion Mise à Jour**
+
+L'interface graphique du projet est bien conçue et offre une expérience utilisateur fluide pour la plupart des fonctionnalités. Cependant, un problème persiste avec la fermeture des fenêtres de manière graphique. Ce problème doit être résolu pour améliorer la stabilité et l'intuitivité de l'application. Une gestion centralisée des fenêtres et une vérification approfondie de la libération des ressources SDL sont recommandées pour corriger ce comportement.

@@ -26,6 +26,7 @@ void sauvegarder_reseau(ReseauNeuronal *reseau, const char *nom_fichier) {
     fclose(f);
 }
 
+
 // Charge un réseau neuronal depuis un fichier
 ReseauNeuronal* charger_reseau(const char *nom_fichier) {
     FILE *f = fopen(nom_fichier, "rb");
@@ -71,4 +72,38 @@ ReseauNeuronal* charger_reseau(const char *nom_fichier) {
     free(taille_couches);
     fclose(f);
     return reseau;
+}
+
+
+void sauvegarder_entier(int nombre, const char *nomFichier) {
+    FILE *f = fopen(nomFichier, "wb");
+    if (!f) {
+        perror("Erreur lors de l'ouverture du fichier pour sauvegarde");
+        return;
+    }
+
+    // Écriture de l'entier
+    fwrite(&nombre, sizeof(int), 1, f);
+
+    fclose(f);
+    printf("Entier %d sauvegardé dans '%s'\n", nombre, nomFichier);
+}
+
+// Relit un entier depuis un fichier binaire
+int charger_entier(const char *nomFichier) {
+    FILE *f = fopen(nomFichier, "rb");
+    if (!f) {
+        perror("Erreur lors de l'ouverture du fichier pour chargement");
+        return -1; // indique une erreur
+    }
+
+    int nombre;
+    if (fread(&nombre, sizeof(int), 1, f) != 1) {
+        perror("Erreur lors de la lecture de l'entier");
+        fclose(f);
+        return -1;
+    }
+
+    fclose(f);
+    return nombre;
 }

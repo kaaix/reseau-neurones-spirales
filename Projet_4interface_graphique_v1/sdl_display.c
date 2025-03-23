@@ -1,6 +1,11 @@
 #include "sdl_display.h"
-#include <SDL.h>
+//#include <SDL.h>
 #include <math.h>
+#include <stdio.h>
+#include <SDL2/SDL.h>
+
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
 
 /**
  * Mélange le bleu et le rouge et ajoute du vert en cas d'incertitude.
@@ -46,6 +51,7 @@ SDL_Color melange_couleurs(double p_bleu, double p_rouge) {
  * Affiche la spirale bleue et la spirale rouge de référence.
  * (Ces courbes sont calculées avec les équations paramétriques et servent de repère.)
  */
+ 
 void afficher_spirales(SDL_Renderer *renderer) {
     int pas = 20; // ajuste la densité des points
     for (int i = 0; i < 1000; i += pas) {
@@ -62,4 +68,42 @@ void afficher_spirales(SDL_Renderer *renderer) {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderDrawPoint(renderer, x_rouge, y_rouge);
     }
+}
+
+
+
+int init_sdl(const char *title, int width, int height) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        printf("SDL_Init Error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+    if (!window) {
+        printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
+        SDL_Quit();
+        return 0;
+    }
+
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 0;
+    }
+
+    return 1;
+}
+
+void cleanup_sdl() {
+    if (renderer) SDL_DestroyRenderer(renderer);
+    if (window) SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+void draw_rectangle(int x, int y, int w, int h, SDL_Color color) {
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_Rect rect = {x, y, w, h};
+    SDL_RenderFillRect(renderer, &rect);
 }

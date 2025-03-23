@@ -5,10 +5,10 @@ CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c11 $(shell sdl2-config --cflags)
 
 # Options d'édition de liens : SDL2 et bibliothèque mathématique
-LDFLAGS = $(shell sdl2-config --libs) -lm
+LDFLAGS = $(shell sdl2-config --libs) -lSDL2_ttf -lm
 
 # Liste des fichiers source
-SRCS = main.c neural_network.c data.c sdl_display.c save.c
+SRCS = main.c neural_network.c data.c sdl_display.c save.c ui_manager.c
 
 # Génération des fichiers objets
 OBJS = $(SRCS:.c=.o)
