@@ -1,7 +1,8 @@
 #include "data.h"
 #include <math.h>
 
-DataPoint dataset[NB_POINTS_SPIRALE * 2];
+DataPoint dataset[NB_POINTS_SPIRALE * MAX_CLASSES];
+//DataPoint dataset[NB_POINTS_SPIRALE * 2]; // 2 classes (bleu et rouge)
 
 // Génère les points des spirales d'Archimède (normalisés dans [-1, 1])
 void generer_spirales_archimede() {
@@ -54,6 +55,32 @@ void colorier_ecran(SDL_Renderer *renderer, ReseauNeuronal *reseau, int width, i
             SDL_Color col = melange_couleurs(p_bleu, p_rouge);
             SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, 255);
             SDL_RenderDrawPoint(renderer, px, py);
+        }
+    }
+}
+
+
+// Génère des spirales personnalisées avec un nombre arbitraire de classes
+void generer_spirales_personnalisees(int nb_classes) {
+    int index = 0;
+    double a = 0.0;        // Décalage initial
+    double b = 0.5;        // Contrôle l'espacement entre les spires
+    double scale = 10.0;   // Facteur de normalisation
+
+    for (int i = 0; i < NB_POINTS_SPIRALE; i++) {
+        double t = i * 0.05;          // Paramètre angulaire
+        double r = a + b * t;        // Rayon selon la spirale d'Archimède
+
+        for (int classe = 0; classe < nb_classes; classe++) {
+            double angle = (2 * M_PI / nb_classes) * classe; // Décalage angulaire pour chaque classe
+            dataset[index].x = (r * cos(t + angle)) / scale;
+            dataset[index].y = (r * sin(t + angle)) / scale;
+
+            // Initialiser les labels pour chaque classe
+            for (int k = 0; k < nb_classes; k++) {
+                dataset[index].label[k] = (k == classe) ? 1.0 : 0.0;
+            }
+            index++;
         }
     }
 }

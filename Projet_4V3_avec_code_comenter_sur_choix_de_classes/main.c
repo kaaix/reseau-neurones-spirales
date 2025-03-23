@@ -16,13 +16,16 @@ int main(int argc, char *argv[]) {
 
     const char *mode = argv[1];
     const char *fichier_sauvegarde = (argc >= 3) ? argv[2] : "reseau_sauvegarde.bin";
+     //const char *fichier_sauvegarde = argv[2] : "reseau_sauvegarde.bin";
+    int nb_classes = (argc >= 4) ? atoi(argv[3]) : 2;
 
     // 1) Génération du dataset en spirale
-    generer_spirales_archimede();
+    //generer_spirales_archimede();
+     generer_spirales_personnalisees(nb_classes);
 
     ReseauNeuronal *reseau = NULL;
 
-    if (strcmp(mode, "load") == 0) {
+    /*if (strcmp(mode, "load") == 0) {
         // Charger un réseau depuis un fichier
         reseau = charger_reseau(fichier_sauvegarde);
         if (!reseau) {
@@ -34,6 +37,31 @@ int main(int argc, char *argv[]) {
         // Créer un nouveau réseau
         int taille_couches[] = {10, 10, 10, 10, 2};
         reseau = creer_reseau(2, 5, taille_couches);
+    } else {
+        printf("Mode inconnu : %s. Utilisez 'train' ou 'load'.\n", mode);
+        return 1;
+    }*/
+
+    // pour les classes personnalisées
+    
+        if (strcmp(mode, "load") == 0) {
+        // Charger un réseau depuis un fichier
+        reseau = charger_reseau(fichier_sauvegarde);
+        if (!reseau) {
+            printf("Erreur : impossible de charger le réseau depuis '%s'.\n", fichier_sauvegarde);
+            return 1;
+        }
+        printf("Réseau chargé avec succès depuis '%s'.\n", fichier_sauvegarde);
+    } else if (strcmp(mode, "train") == 0) {
+        // Créer un nouveau réseau
+        int *taille_couches = malloc((nb_classes + 3) * sizeof(int));
+        for (int i = 0; i < nb_classes + 2; i++) {
+            taille_couches[i] = 10; // Exemple : 10 neurones par couche cachée
+        }
+        taille_couches[nb_classes + 2] = nb_classes; // Dernière couche = nb_classes
+
+        reseau = creer_reseau(2, nb_classes + 2, taille_couches);
+        free(taille_couches);
     } else {
         printf("Mode inconnu : %s. Utilisez 'train' ou 'load'.\n", mode);
         return 1;
@@ -61,7 +89,7 @@ int main(int argc, char *argv[]) {
         }
 
         // Effectuer quelques itérations d'entraînement (batch de 1000 itérations)
-        for (int step = 0; step < 50000; step++) {
+        for (int step = 0; step < 150000; step++) {
             int idx = rand() % (NB_POINTS_SPIRALE * 2);
             double entree[2] = { dataset[idx].x, dataset[idx].y };
             propagation(reseau, entree);
