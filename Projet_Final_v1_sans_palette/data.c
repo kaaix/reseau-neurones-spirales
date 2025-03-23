@@ -7,6 +7,9 @@ DataPoint dataset_P[NB_POINTS_SPIRALE * MAX_CLASSES];
 // Le dataset contiendra 2*NB_POINTS_SPIRALE points (une spirale pour chaque classe)
 DataPoint dataset[NB_POINTS_SPIRALE * 2]; // 2 classes (bleu et rouge)
 
+int nb_dessin = 0; // Compteur pour le nombre de points dessinés
+DataPoint3 dessin[MAX_DESSIN]; // Tableau pour stocker les points à dessiner
+
 // Génère les points des spirales d'Archimède (normalisés dans [-1, 1])
 void generer_spirales_archimede() {
     int index = 0;

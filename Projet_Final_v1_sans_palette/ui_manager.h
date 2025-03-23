@@ -29,4 +29,8 @@ void draw_button(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_R
 // permet de selectionner le nombre de classes
 void show_custom_spirals_window();
 void show_train_execution_window_custom(int nb_classes,const char *filename);
+
+void show_drawing_window();
+void show_training_window_for_drawing();
+void show_drawing_choice_window();
 #endif // UI_MANAGER_H

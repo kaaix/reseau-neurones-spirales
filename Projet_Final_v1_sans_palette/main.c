@@ -155,8 +155,9 @@ int main(int argc, char *argv[]) {
     SDL_Color buttonColor = {169, 169, 169, 255}; // Gris clair
     SDL_Color borderColor = {0, 0, 0, 255};       // Noir pour la bordure
     SDL_Color textColor = {0, 0, 0, 255};         // Noir pour le texte
-    SDL_Rect buttonRB = {300, 200, 200, 100};     // Bouton "R/B"
-    SDL_Rect buttonCustom = {300, 350, 200, 100}; // Bouton "Personnalisé"
+    SDL_Rect buttonRB = {300, 150, 200, 100};     // Bouton "R/B"
+    SDL_Rect buttonCustom = {300, 300, 200, 100}; // Bouton "Personnalisé"
+    SDL_Rect buttonDraw = {300, 450, 200, 100};   // Bouton "Dessiner"
 
     int running = 1;
     SDL_Event event;
@@ -182,6 +183,12 @@ int main(int argc, char *argv[]) {
                     show_train_or_load_window(1); // Mode Personnalisé
                     running = 0; // Fermer la fenêtre actuelle
                 }
+
+                // Vérifier si le clic est dans le bouton "Dessiner"
+                if (x >= buttonDraw.x && x <= buttonDraw.x + buttonDraw.w &&
+                    y >= buttonDraw.y && y <= buttonDraw.y + buttonDraw.h) {
+                    show_drawing_choice_window(); // Afficher le choix entre "Nouveau" et "Charger"
+                }
             }
         }
 
@@ -191,6 +198,7 @@ int main(int argc, char *argv[]) {
         // Dessiner les boutons
         draw_button(renderer, font, "R/B", buttonRB, buttonColor, borderColor, textColor);
         draw_button(renderer, font, "Personnalise", buttonCustom, buttonColor, borderColor, textColor);
+        draw_button(renderer, font, "Dessiner", buttonDraw, buttonColor, borderColor, textColor);
 
         SDL_RenderPresent(renderer);
     }

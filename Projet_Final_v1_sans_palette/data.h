@@ -9,12 +9,22 @@
 
 #define NB_POINTS_SPIRALE 500
 #define MAX_CLASSES 10
+#define MAX_DESSIN 10000
 
 typedef struct {
     double x;
     double y;
     double label[2];
 } DataPoint;
+
+typedef struct {
+    double x;
+    double y;
+    double label[3];
+} DataPoint3;
+
+extern int nb_dessin;
+extern DataPoint3 dessin[MAX_DESSIN];
 
 // le dataset_p contiendra MAX_CLASSES spirales
 // (une spirale pour chaque classe)
