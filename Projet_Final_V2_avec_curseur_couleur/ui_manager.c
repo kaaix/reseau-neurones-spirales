@@ -586,7 +586,7 @@ void show_drawing_window() {
     SDL_Window *win = SDL_CreateWindow(
         "Dessine tes données",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        800, 600, SDL_WINDOW_SHOWN
+        800, 600, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
     );
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
@@ -604,14 +604,27 @@ void show_drawing_window() {
     SDL_Event e;
 
     // Couleur active (par défaut : rouge)
-    int couleur_active = 0; // 0 = rouge, 1 = vert, 2 = bleu
+    int r = 255, g = 0, b = 0; // Composantes de la couleur active
     int drawing = 0; // Indique si la souris est en train de dessiner
 
-    // Définir les boutons
-    SDL_Rect validateButton = {600, 450, 200, 100};
-    SDL_Rect clearButton = {600, 350, 200, 100};
+    // Dimensions initiales de la fenêtre
+    int windowWidth = 800, windowHeight = 600;
 
     while (running && globalRunning) {
+        // Récupérer la taille actuelle de la fenêtre
+        SDL_GetWindowSize(win, &windowWidth, &windowHeight);
+
+        // Recalculer les zones dynamiquement
+        SDL_Rect drawingArea = {20, 20, windowWidth - 240, windowHeight - 40}; // Zone de dessin
+        SDL_Rect controlsArea = {windowWidth - 200, 20, 180, windowHeight - 40}; // Zone des contrôles
+
+        SDL_Rect redSlider = {controlsArea.x + 20, controlsArea.y + 50, controlsArea.w - 40, 20};
+        SDL_Rect greenSlider = {controlsArea.x + 20, controlsArea.y + 100, controlsArea.w - 40, 20};
+        SDL_Rect blueSlider = {controlsArea.x + 20, controlsArea.y + 150, controlsArea.w - 40, 20};
+
+        SDL_Rect validateButton = {controlsArea.x + 20, controlsArea.y + controlsArea.h - 80, controlsArea.w - 40, 40};
+        SDL_Rect clearButton = {controlsArea.x + 20, controlsArea.y + controlsArea.h - 140, controlsArea.w - 40, 40};
+
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 running = 0;
@@ -620,33 +633,36 @@ void show_drawing_window() {
                 int x = e.button.x;
                 int y = e.button.y;
 
-                // Vérifier si le clic est dans le panneau de sélection de couleur
-                if (x >= 600 && x <= 800) {
-                    if (y >= 50 && y < 150) {
-                        couleur_active = 0; // Rouge
-                    } else if (y >= 150 && y < 250) {
-                        couleur_active = 1; // Vert
-                    } else if (y >= 250 && y < 350) {
-                        couleur_active = 2; // Bleu
-                    } else if (y >= 350 && y < 450) {
-                        nb_dessin = 0; // Effacer les points dessinés
-                    } else if (y >= 450 && y < 550) {
-                        // Clic sur le bouton "Valider et Entraîner"
-                        show_training_window_for_drawing();
-                        running = 0; // Fermer la fenêtre après l'entraînement
-                    }
-                } else if (nb_dessin < MAX_DESSIN) {
-                    // Ajouter un point dans la zone de dessin
-                    double nx = (double)x / 300.0 - 1.0; // Normaliser en [-1, 1]
-                    double ny = (double)y / 300.0 - 1.0;
+                // Vérifier si le clic est sur un curseur
+                if (x >= redSlider.x && x <= redSlider.x + redSlider.w && y >= redSlider.y && y <= redSlider.y + redSlider.h) {
+                    r = (x - redSlider.x) * 255 / redSlider.w; // Ajuster la composante rouge
+                } else if (x >= greenSlider.x && x <= greenSlider.x + greenSlider.w && y >= greenSlider.y && y <= greenSlider.y + greenSlider.h) {
+                    g = (x - greenSlider.x) * 255 / greenSlider.w; // Ajuster la composante verte
+                } else if (x >= blueSlider.x && x <= blueSlider.x + blueSlider.w && y >= blueSlider.y && y <= blueSlider.y + blueSlider.h) {
+                    b = (x - blueSlider.x) * 255 / blueSlider.w; // Ajuster la composante bleue
+                }
 
-                    if (couleur_active == 0) { // Rouge
-                        dessin[nb_dessin] = (DataPoint3){nx, ny, {1.0, 0.0, 0.0}};
-                    } else if (couleur_active == 1) { // Vert
-                        dessin[nb_dessin] = (DataPoint3){nx, ny, {0.0, 1.0, 0.0}};
-                    } else if (couleur_active == 2) { // Bleu
-                        dessin[nb_dessin] = (DataPoint3){nx, ny, {0.0, 0.0, 1.0}};
-                    }
+                // Vérifier si le clic est dans le bouton "Effacer"
+                if (x >= clearButton.x && x <= clearButton.x + clearButton.w &&
+                    y >= clearButton.y && y <= clearButton.y + clearButton.h) {
+                    nb_dessin = 0; // Effacer les points dessinés
+                }
+
+                // Vérifier si le clic est dans le bouton "Valider et Entraîner"
+                if (x >= validateButton.x && x <= validateButton.x + validateButton.w &&
+                    y >= validateButton.y && y <= validateButton.y + validateButton.h) {
+                    show_training_window_for_drawing();
+                    running = 0; // Fermer la fenêtre après l'entraînement
+                }
+
+                // Ajouter un point dans la zone de dessin
+                if (x >= drawingArea.x && x <= drawingArea.x + drawingArea.w &&
+                    y >= drawingArea.y && y <= drawingArea.y + drawingArea.h &&
+                    nb_dessin < MAX_DESSIN) {
+                    double nx = (double)(x - drawingArea.x) / drawingArea.w * 2.0 - 1.0; // Normaliser en [-1, 1]
+                    double ny = (double)(y - drawingArea.y) / drawingArea.h * 2.0 - 1.0;
+
+                    dessin[nb_dessin] = (DataPoint3){nx, ny, {r / 255.0, g / 255.0, b / 255.0}};
                     nb_dessin++;
                 }
                 drawing = 1; // Activer le mode dessin
@@ -656,73 +672,87 @@ void show_drawing_window() {
                 int x = e.motion.x;
                 int y = e.motion.y;
 
-                if (x < 600 && nb_dessin < MAX_DESSIN) { // Zone de dessin uniquement
-                    double nx = (double)x / 300.0 - 1.0; // Normaliser en [-1, 1]
-                    double ny = (double)y / 300.0 - 1.0;
+                if (x >= drawingArea.x && x <= drawingArea.x + drawingArea.w &&
+                    y >= drawingArea.y && y <= drawingArea.y + drawingArea.h &&
+                    nb_dessin < MAX_DESSIN) {
+                    double nx = (double)(x - drawingArea.x) / drawingArea.w * 2.0 - 1.0; // Normaliser en [-1, 1]
+                    double ny = (double)(y - drawingArea.y) / drawingArea.h * 2.0 - 1.0;
 
-                    if (couleur_active == 0) { // Rouge
-                        dessin[nb_dessin] = (DataPoint3){nx, ny, {1.0, 0.0, 0.0}};
-                    } else if (couleur_active == 1) { // Vert
-                        dessin[nb_dessin] = (DataPoint3){nx, ny, {0.0, 1.0, 0.0}};
-                    } else if (couleur_active == 2) { // Bleu
-                        dessin[nb_dessin] = (DataPoint3){nx, ny, {0.0, 0.0, 1.0}};
-                    }
+                    dessin[nb_dessin] = (DataPoint3){nx, ny, {r / 255.0, g / 255.0, b / 255.0}};
                     nb_dessin++;
                 }
             }
         }
 
-        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255); // Fond blanc
+        SDL_SetRenderDrawColor(rend, 240, 240, 240, 255); // Fond gris clair
         SDL_RenderClear(rend);
+
+        // Dessiner la zone de dessin
+        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255); // Fond blanc
+        SDL_RenderFillRect(rend, &drawingArea);
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255); // Bordure noire
+        SDL_RenderDrawRect(rend, &drawingArea);
 
         // Dessiner les points
         for (int i = 0; i < nb_dessin; i++) {
-            int px = (int)((dessin[i].x + 1.0) * 300.0);
-            int py = (int)((dessin[i].y + 1.0) * 300.0);
+            int px = drawingArea.x + (int)((dessin[i].x + 1.0) / 2.0 * drawingArea.w);
+            int py = drawingArea.y + (int)((dessin[i].y + 1.0) / 2.0 * drawingArea.h);
 
-            if (dessin[i].label[0] > 0.5) SDL_SetRenderDrawColor(rend, 255, 0, 0, 255); // Rouge
-            else if (dessin[i].label[1] > 0.5) SDL_SetRenderDrawColor(rend, 0, 255, 0, 255); // Vert
-            else SDL_SetRenderDrawColor(rend, 0, 0, 255, 255); // Bleu
-
+            SDL_SetRenderDrawColor(rend, (Uint8)(dessin[i].label[0] * 255),
+                                         (Uint8)(dessin[i].label[1] * 255),
+                                         (Uint8)(dessin[i].label[2] * 255), 255);
             SDL_Rect pointRect = {px - 3, py - 3, 6, 6};
             SDL_RenderFillRect(rend, &pointRect);
         }
 
-        // Dessiner le panneau de sélection de couleur
-        SDL_Rect rouge = {600, 50, 200, 100};
-        SDL_Rect vert = {600, 150, 200, 100};
-        SDL_Rect bleu = {600, 250, 200, 100};
+        // Dessiner la zone des contrôles
+        SDL_SetRenderDrawColor(rend, 220, 220, 220, 255); // Fond gris clair
+        SDL_RenderFillRect(rend, &controlsArea);
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255); // Bordure noire
+        SDL_RenderDrawRect(rend, &controlsArea);
 
+        // Dessiner les curseurs
         SDL_SetRenderDrawColor(rend, 255, 0, 0, 255); // Rouge
-        SDL_RenderFillRect(rend, &rouge);
-
+        SDL_RenderFillRect(rend, &redSlider);
         SDL_SetRenderDrawColor(rend, 0, 255, 0, 255); // Vert
-        SDL_RenderFillRect(rend, &vert);
-
+        SDL_RenderFillRect(rend, &greenSlider);
         SDL_SetRenderDrawColor(rend, 0, 0, 255, 255); // Bleu
-        SDL_RenderFillRect(rend, &bleu);
+        SDL_RenderFillRect(rend, &blueSlider);
 
-        // Indiquer la couleur active avec un cadre noir
-        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-        SDL_Rect cadre;
-        if (couleur_active == 0) cadre = rouge;
-        else if (couleur_active == 1) cadre = vert;
-        else cadre = bleu;
-        SDL_RenderDrawRect(rend, &cadre);
+        // Dessiner les indicateurs de position sur les curseurs
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255); // Noir
+        SDL_Rect redCursor = {redSlider.x + (r * redSlider.w / 255) - 5, redSlider.y - 5, 10, 30};
+        SDL_Rect greenCursor = {greenSlider.x + (g * greenSlider.w / 255) - 5, greenSlider.y - 5, 10, 30};
+        SDL_Rect blueCursor = {blueSlider.x + (b * blueSlider.w / 255) - 5, blueSlider.y - 5, 10, 30};
+        SDL_RenderFillRect(rend, &redCursor);
+        SDL_RenderFillRect(rend, &greenCursor);
+        SDL_RenderFillRect(rend, &blueCursor);
 
-        // Afficher des instructions
-        SDL_Color textColor = {255, 255, 255, 255};
-        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255); // Fond noir pour le texte
-        SDL_Rect instructions = {0, 0, 800, 40};
-        SDL_RenderFillRect(rend, &instructions);
-        render_text(rend, font, "Cliquez et maintenez pour dessiner. Choisissez une couleur.", instructions, textColor);
+        // Dessiner les indicateurs numériques
+        char colorValue[16];
+        SDL_Color textColor = {0, 0, 0, 255}; // Noir
+
+        // Indicateur pour le rouge
+        SDL_Rect textRect = {redSlider.x - 60, redSlider.y, 50, 20}; // Position à gauche du curseur
+        snprintf(colorValue, sizeof(colorValue), "%d", r);
+        render_text(rend, font, colorValue, textRect, textColor);
+
+        // Indicateur pour le vert
+        textRect.y = greenSlider.y;
+        snprintf(colorValue, sizeof(colorValue), "%d", g);
+        render_text(rend, font, colorValue, textRect, textColor);
+
+        // Indicateur pour le bleu
+        textRect.y = blueSlider.y;
+        snprintf(colorValue, sizeof(colorValue), "%d", b);
+        render_text(rend, font, colorValue, textRect, textColor);
 
         // Dessiner les boutons
         SDL_Color buttonColor = {169, 169, 169, 255}; // Gris clair
         SDL_Color borderColor = {0, 0, 0, 255};       // Noir pour la bordure
         SDL_Color buttonTextColor = {0, 0, 0, 255};   // Noir pour le texte
         draw_button(rend, font, "Effacer", clearButton, buttonColor, borderColor, buttonTextColor);
-        draw_button(rend, font, "Valider et Entrainer", validateButton, buttonColor, borderColor, buttonTextColor);
+        draw_button(rend, font, "Valider", validateButton, buttonColor, borderColor, buttonTextColor);
 
         SDL_RenderPresent(rend);
         SDL_Delay(10);
@@ -734,6 +764,7 @@ void show_drawing_window() {
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
 }
+
 
 void show_training_window_for_drawing() {
     if (nb_dessin == 0) {
