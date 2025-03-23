@@ -3,27 +3,35 @@
 
 DataPoint dataset[NB_POINTS_SPIRALE * 2];
 
-void generer_spirales() {
+// Génère les points des spirales d'Archimède (normalisés dans [-1, 1])
+void generer_spirales_archimede() {
     int index = 0;
-    // Définir la valeur maximale de t pour normaliser les données (par exemple, t_max = NB_POINTS_SPIRALE * 0.1)
-   double scale = NB_POINTS_SPIRALE * 0.1; // Par exemple, 500 * 0.1 = 50
+    double a = 0.0;        // Décalage initial (tu peux ajuster)
+    double b = 1.0;        // Contrôle l'espacement entre les spires
+    // Choisis un facteur de normalisation pour ramener les points dans [-1,1]
+    double scale = NB_POINTS_SPIRALE * 0.1;  // Ajuste cette valeur si besoin
+
     for (int i = 0; i < NB_POINTS_SPIRALE; i++) {
-        double t = i * 0.1;
-        // Spirale bleue (classe 1)
-        dataset[index].x = (t * cos(t)) / scale;
-        dataset[index].y = (t * sin(t)) / scale;
-        dataset[index].label[0] = 1.0; // bleu
+        double t = i * 0.1;          // Paramètre angulaire
+        double r = a + b * t;        // Rayon selon la spirale d'Archimède
+
+        // Génération de la spirale bleue (classe 1)
+        dataset[index].x = (r * cos(t)) / scale;
+        dataset[index].y = (r * sin(t)) / scale;
+        dataset[index].label[0] = 1.0;   // bleu
         dataset[index].label[1] = 0.0;
         index++;
 
-        // Spirale rouge (classe 2)
-        dataset[index].x = (-t * cos(t)) / scale;
-        dataset[index].y = (-t * sin(t)) / scale;
+        // Génération de la spirale rouge (classe 2)
+        // On décale l'angle de PI pour obtenir l'opposée
+        dataset[index].x = (r * cos(t + M_PI)) / scale;
+        dataset[index].y = (r * sin(t + M_PI)) / scale;
         dataset[index].label[0] = 0.0;
-        dataset[index].label[1] = 1.0; // rouge
+        dataset[index].label[1] = 1.0;   // rouge
         index++;
     }
 }
+
 
 void colorier_ecran(SDL_Renderer *renderer, ReseauNeuronal *reseau, int width, int height) {
     // Ici, on suppose que les entrées du réseau sont dans [-1, 1]
@@ -40,8 +48,8 @@ void colorier_ecran(SDL_Renderer *renderer, ReseauNeuronal *reseau, int width, i
             double s_rouge = reseau->couches[last][1].sortie;  // neurone 1 pour la classe rouge
 
             // On convertit la sortie de tanh (∈[-1,1]) en probabilité ∈[0,1]
-            double p_bleu  = (s_bleu  + 1.0) ;/// 2.0;
-            double p_rouge = (s_rouge + 1.0) ;/// 2.0;
+            double p_bleu  = (s_bleu  + 1.0) / 2.0;
+            double p_rouge = (s_rouge + 1.0) / 2.0;
 
             SDL_Color col = melange_couleurs(p_bleu, p_rouge);
             SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, 255);

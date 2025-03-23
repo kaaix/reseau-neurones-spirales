@@ -11,10 +11,12 @@ int main(int argc, char *argv[]) {
     (void)argv;
 
     // 1) Génération du dataset en spirale
-    generer_spirales();
+   // 1) Génération du dataset en spirale d'Archimède
+   generer_spirales_archimede();
+
 
     // 2) Création du réseau
-    // Ici, nous choisissons 4 couches cachées de 10 neurones et une couche de sortie de 2 neurones (total 5 couches)
+    // Ici, nous choisissons 5 couches cachées de 10 neurones et une couche de sortie de 2 neurones (total 5 couches)
     int taille_couches[] = {10, 10, 10, 10, 2};
     ReseauNeuronal *reseau = creer_reseau(2, 5, taille_couches);
 
@@ -26,7 +28,7 @@ int main(int argc, char *argv[]) {
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     srand((unsigned)time(NULL));
-    double epsilon = 0.01; // Taux d'apprentissage plus faible pour une convergence progressive
+    double epsilon = 0.001; // Taux d'apprentissage plus faible pour une convergence progressive
 
     // 4) Boucle d’événements + apprentissage en continu
     SDL_Event event;
@@ -40,7 +42,7 @@ int main(int argc, char *argv[]) {
         }
 
         // Effectuer quelques itérations d'entraînement (batch de 1000 itérations)
-        for (int step = 0; step < 10000; step++) {
+        for (int step = 0; step < 50000; step++) {
             int idx = rand() % (NB_POINTS_SPIRALE * 2);
             double entree[2] = { dataset[idx].x, dataset[idx].y };
             propagation(reseau, entree);
