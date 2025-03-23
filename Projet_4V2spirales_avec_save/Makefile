@@ -8,7 +8,7 @@ CFLAGS = -Wall -Wextra -O2 -std=c11 $(shell sdl2-config --cflags)
 LDFLAGS = $(shell sdl2-config --libs) -lm
 
 # Liste des fichiers source
-SRCS = main.c neural_network.c data.c sdl_display.c
+SRCS = main.c neural_network.c data.c sdl_display.c save.c
 
 # Génération des fichiers objets
 OBJS = $(SRCS:.c=.o)
@@ -25,5 +25,9 @@ $(EXEC): $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+cleanid:
+	find . -type f -name "*:Zone.Identifier" -exec rm -f {} +
+
 clean:
-	rm -f $(OBJS) $(EXEC)
+	rm -f $(OBJS) $(EXEC) *.bin
+	find . -type f -name "*:Zone.Identifier" -exec rm -f {} +

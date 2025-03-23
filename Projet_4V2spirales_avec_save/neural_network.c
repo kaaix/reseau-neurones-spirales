@@ -199,3 +199,4 @@ void backpropagation(ReseauNeuronal *reseau, const double *entrees,
         }
     }
 }
+
