@@ -5,21 +5,40 @@
 /**
  * Mélange le bleu et le rouge et ajoute du vert en cas d'incertitude.
  */
-SDL_Color melange_couleurs(double p_bleu, double p_rouge) {
-    /*if (p_bleu < 0)  p_bleu = 0;
+/*SDL_Color melange_couleurs(double p_bleu, double p_rouge) {
+     if (p_bleu < 0)  p_bleu = 0;
     if (p_bleu > 1)  p_bleu = 1;
     if (p_rouge < 0) p_bleu = 0;
-    if (p_rouge > 1) p_rouge = 1;*/
+    if (p_rouge > 1) p_rouge = 1;
 
     // Calcul de l'incertitude : plus les deux valeurs sont proches, plus c'est incertain (et donc plus vert)
    // double incertitude = 1.0 - fabs(p_bleu - p_rouge);
 
     // Conversion en canaux [0, 255]
-    Uint8 r = (Uint8)(p_rouge * 255);
+   Uint8 r = (Uint8)(p_rouge * 255);
     //Uint8 g = (Uint8)(incertitude * 0);
     Uint8 b = (Uint8)(p_bleu * 255);
 
     SDL_Color color = { r, 0, b, 255}; 
+    return color;
+}*/
+
+SDL_Color melange_couleurs(double p_bleu, double p_rouge) {
+    // S'assurer que les valeurs sont dans [0, 1]
+    if (p_bleu < 0) p_bleu = 0;
+    if (p_bleu > 1) p_bleu = 1;
+    if (p_rouge < 0) p_rouge = 0;
+    if (p_rouge > 1) p_rouge = 1;
+
+    // Calcul de l'incertitude : plus p_bleu et p_rouge sont proches, plus le vert est présent.
+    double incertitude = 1.0 - fabs(p_bleu - p_rouge);
+
+    // Conversion des valeurs en canaux [0, 255]
+    Uint8 r = (Uint8)(p_rouge * 255);
+    Uint8 g = (Uint8)(incertitude * 0);  // Ajoute du vert proportionnellement à l'incertitude
+    Uint8 b = (Uint8)(p_bleu * 255);
+
+    SDL_Color color = { r, g, b, 255 };
     return color;
 }
 

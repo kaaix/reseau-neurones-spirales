@@ -7,12 +7,12 @@ DataPoint dataset[NB_POINTS_SPIRALE * 2];
 void generer_spirales_archimede() {
     int index = 0;
     double a = 0.0;        // Décalage initial (tu peux ajuster)
-    double b = 1.0;        // Contrôle l'espacement entre les spires
+    double b = 0.5;        // Contrôle l'espacement entre les spires
     // Choisis un facteur de normalisation pour ramener les points dans [-1,1]
-    double scale = NB_POINTS_SPIRALE * 0.1;  // Ajuste cette valeur si besoin
+    double scale = 10.0 ; // Ajuste cette valeur si besoin
 
     for (int i = 0; i < NB_POINTS_SPIRALE; i++) {
-        double t = i * 0.1;          // Paramètre angulaire
+        double t = i * 0.05;          // Paramètre angulaire
         double r = a + b * t;        // Rayon selon la spirale d'Archimède
 
         // Génération de la spirale bleue (classe 1)
