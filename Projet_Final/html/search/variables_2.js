@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['dataset_0',['dataset',['../_bench_2_v1___bench_2src_2data_8c.html#ac0a2e0d1113a0a9c2c815e656932d3a1',1,'dataset:&#160;data.c'],['../_bench_2_v1___bench_2src_2data_8h.html#ac0a2e0d1113a0a9c2c815e656932d3a1',1,'dataset:&#160;data.c'],['../_bench_2_v2___bench_2src_2data_8c.html#ac0a2e0d1113a0a9c2c815e656932d3a1',1,'dataset:&#160;data.c'],['../_bench_2_v2___bench_2src_2data_8h.html#ac0a2e0d1113a0a9c2c815e656932d3a1',1,'dataset:&#160;data.c'],['../src_2data_8c.html#ac0a2e0d1113a0a9c2c815e656932d3a1',1,'dataset:&#160;data.c'],['../src_2data_8h.html#ac0a2e0d1113a0a9c2c815e656932d3a1',1,'dataset:&#160;data.c']]],
+  ['dataset_5fp_1',['dataset_P',['../_bench_2_v1___bench_2src_2data_8c.html#abc94020398029d3a0537afe7a079d8b0',1,'dataset_P:&#160;data.c'],['../_bench_2_v1___bench_2src_2data_8h.html#abc94020398029d3a0537afe7a079d8b0',1,'dataset_P:&#160;data.c'],['../_bench_2_v2___bench_2src_2data_8c.html#abc94020398029d3a0537afe7a079d8b0',1,'dataset_P:&#160;data.c'],['../_bench_2_v2___bench_2src_2data_8h.html#abc94020398029d3a0537afe7a079d8b0',1,'dataset_P:&#160;data.c'],['../src_2data_8c.html#abc94020398029d3a0537afe7a079d8b0',1,'dataset_P:&#160;data.c'],['../src_2data_8h.html#abc94020398029d3a0537afe7a079d8b0',1,'dataset_P:&#160;data.c']]],
+  ['delta_2',['delta',['../struct_neurone.html#a9ea1a8f5ef3e6d20b362385e1288c72c',1,'Neurone']]],
+  ['dessin_3',['dessin',['../src_2data_8c.html#ab8c9b22cccb6d5ca0724d8afa77d2d24',1,'dessin:&#160;data.c'],['../src_2data_8h.html#ab8c9b22cccb6d5ca0724d8afa77d2d24',1,'dessin:&#160;data.c']]]
+];
